@@ -1,33 +1,54 @@
-const myLibrary = [];
+class Library {
 
-function Book(title, author, pages, status) {
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.status = status;
+    books = [];
+
+    toggleStatus(index) {
+        this.books[index].toggleStatus();
+        this.refreshLibrary();
+    }
+
+    addBookToLibrary() {
+        let title = document.querySelector('#title').value;
+        let author = document.querySelector('#author').value;
+        let pages = document.querySelector('#pages').value;
+        let status = document.querySelector('#status').checked;
+        let book = new Book(title, author, pages, status);
+        this.books.push(book);
+    }
+
+    removeBook(index) {
+        this.books.splice(index, 1);
+        this.refreshLibrary();
+    }
+
+    refreshLibrary() {
+        const bookLibrary = document.querySelector('.library');
+        bookLibrary.innerHTML = "";
+        for (let book of this.books) {
+            let newBookCard = document.createElement('div');
+            newBookCard.innerHTML = `<p>${book.bookInfo}</p>
+                <button class="status-btn" onClick="myLibrary.toggleStatus(${this.books.indexOf(book)})">Toggle status</button>
+                <button class="remove-btn" onClick="myLibrary.removeBook(${this.books.indexOf(book)})">Remove</button>`;
+            bookLibrary.appendChild(newBookCard);
+        }
+    }
 }
 
-Book.prototype.toggleStatus = function () {
-    this.status = !this.status;
-}
+class Book {
+    constructor(title, author, pages, status) {
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.status = status;
+    }
 
-function toggleStatus(index) {
-    myLibrary[index].toggleStatus();
-    refreshLibrary();
-}
+    toggleStatus() {
+        this.status = !this.status;
+    }
 
-function addBookToLibrary() {
-    let title = document.querySelector('#title').value;
-    let author = document.querySelector('#author').value;
-    let pages = document.querySelector('#pages').value;
-    let status = document.querySelector('#status').checked;
-    let book = new Book(title, author, pages, status);
-    myLibrary.push(book);
-}
-
-
-function showBooks() {
-
+    get bookInfo() {
+        return `Title: ${this.title} \n Author: ${this.author} \n Pages: ${this.pages} \n Read: ${this.status}`;
+    }
 }
 
 // Displays the form after clicking "add book" button
@@ -40,27 +61,8 @@ addBookBtn.addEventListener('click', () => {
 // Makes submit button add new book to the library
 const addBookToLibraryBtn = document.querySelector('.add-book-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    addBookToLibrary();
-    refreshLibrary();
+    myLibrary.addBookToLibrary();
+    myLibrary.refreshLibrary();
 })
 
-function refreshLibrary() {
-    const bookLibrary = document.querySelector('.library');
-    bookLibrary.innerHTML = "";
-    for (book of myLibrary) {
-        let newBookCard = document.createElement('div');
-        newBookCard.innerHTML = `<p>${getBookInfo(book)}</p>
-        <button class="status-btn" onClick="toggleStatus(${myLibrary.indexOf(book)})">Toggle status</button>
-        <button class=remove-btn onClick="removeBook(${myLibrary.indexOf(book)})">Remove</button`;
-        bookLibrary.appendChild(newBookCard);
-    }
-}
-
-function getBookInfo(book) {
-    return `Title: ${book.title} \n Author: ${book.author} \n Pages: ${book.pages} \n Read: ${book.status}`;
-}
-
-function removeBook(index) {
-    myLibrary.splice(index, 1);
-    refreshLibrary();
-}
+let myLibrary = new Library();
